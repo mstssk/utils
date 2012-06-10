@@ -13,11 +13,17 @@ then
 fi
 
 input=$1
-audiotype=`ffmpeg -i $input 2>&1 | grep Audio | sed -e "s/^.*Audio:\\s\(\\w\+\).*$/\1/"`
-filename=`echo $input | sed -e "s/\.[^.]\+$//"`
+audiotype=`ffmpeg -i "$input" 2>&1 | grep Audio | sed -e "s/^.*Audio:\\s\(\\w\+\).*$/\1/"`
+if [ ! "$audiotype" ]
+then
+	echo "Failed to recognize audio stream type (x_x)"
+	exit
+fi
+
+filename=`echo "$input" | sed -e "s/\.[^.]\+$//"`
 output=$filename.$audiotype
 echo "Extract from $input to $output"
-if [ -e $output ]
+if [ -e "$output" ]
 then
 	echo "File '$output' is already exists. Overwrite? [y/N] "
 	read ans
@@ -29,8 +35,7 @@ then
 	fi
 fi
 
-yes|ffmpeg -i $input -vn -acodec copy $filename.$audiotype 2> /dev/null
+yes|ffmpeg -i "$input" -vn -acodec copy "$output" 2> /dev/null
 echo "Done!"
-
 
 
